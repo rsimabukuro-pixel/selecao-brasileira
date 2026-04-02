@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seleção Brasileira - Últimos 10 Jogos</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a2a4a;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #009c3b 0%, #006622 100%);
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom: 6px solid #FFDF00;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .flag-icon {
+      font-size: 60px;
+      margin-bottom: 12px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #FFDF00;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: #ccffcc;
+      margin-top: 8px;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #FFDF00;
+      color: #006622;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 24px 20px;
+      background: #071e36;
+      border-bottom: 3px solid #1a4a7a;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      opacity: 0.6;
+      letter-spacing: 1px;
+    }
+
+    .stat-value.wins  { color: #2ecc71; }
+    .stat-value.draws { color: #FFDF00; }
+    .stat-value.losses { color: #e74c3c; }
+    .stat-value.gf    { color: #3498db; }
+    .stat-value.ga    { color: #e67e22; }
+
+    .container {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #FFDF00;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1a4a7a;
+    }
+
+    .games-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .game-card {
+      background: linear-gradient(135deg, #0f2f4f, #0d2a3d);
+      border: 1px solid #1e4e7e;
+      border-left: 5px solid #555;
+      border-radius: 10px;
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 90px 1fr auto auto;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .game-card.win   { border-left-color: #2ecc71; }
+    .game-card.draw  { border-left-color: #FFDF00; }
+    .game-card.loss  { border-left-color: #e74c3c; }
+
+    .game-number {
+      font-size: 0.75rem;
+      color: #6caf6c;
+      font-weight: 600;
+    }
+
+    .game-date {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #FFDF00;
+    }
+
+    .game-date-sub {
+      font-size: 0.75rem;
+      color: #88aa88;
+      margin-top: 2px;
+    }
+
+    .game-info {
+      flex: 1;
+    }
+
+    .game-matchup {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e8ffe8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .game-matchup img {
+      width: 28px;
+      height: 20px;
+      object-fit: cover;
+      border-radius: 3px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    .vs-text {
+      color: #aaaaaa;
+      font-weight: 400;
+      font-size: 0.9rem;
+    }
+
+    .game-competition {
+      font-size: 0.78rem;
+      color: #88aa88;
+      margin-top: 4px;
+    }
+
+    .game-score {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 2px;
+      text-align: center;
+      min-width: 90px;
+    }
+
+    .result-badge {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .result-badge.win   { background: #1a5c2a; color: #2ecc71; border: 1px solid #2ecc71; }
+    .result-badge.draw  { background: #4d4400; color: #FFDF00; border: 1px solid #FFDF00; }
+    .result-badge.loss  { background: #5c1a1a; color: #e74c3c; border: 1px solid #e74c3c; }
+
+    .coach-section {
+      margin-top: 40px;
+      background: linear-gradient(135deg, #0f2f4f, #0d2a3d);
+      border: 1px solid #1e4e7e;
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .coach-icon { font-size: 2.5rem; }
+
+    .coach-info h3 { color: #FFDF00; font-size: 1rem; }
+    .coach-info p  { color: #aaddaa; font-size: 0.9rem; margin-top: 4px; }
+
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #4a7aaa;
+      font-size: 0.8rem;
+      margin-top: 40px;
+      border-top: 1px solid #1a4a7a;
+    }
+
+    @media (max-width: 600px) {
+      .game-card {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+      }
+      .game-date { grid-column: 1; }
+      .game-score { grid-column: 2; text-align: right; }
+      .game-info { grid-column: 1 / -1; }
+      .result-badge { grid-column: 1 / -1; width: fit-content; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="flag-icon">🇧🇷</div>
+    <h1>Seleção Brasileira</h1>
+    <p>Resultados dos últimos 10 jogos</p>
+    <div class="badge">Técnico: Carlo Ancelotti</div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-value wins">5</div>
+      <div class="stat-label">Vitórias</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value draws">2</div>
+      <div class="stat-label">Empates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value losses">3</div>
+      <div class="stat-label">Derrotas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value gf">19</div>
+      <div class="stat-label">Gols Feitos</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value ga">8</div>
+      <div class="stat-label">Gols Sofridos</div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="section-title">Jogos (mais recente primeiro)</div>
+
+    <div class="games-list">
+
+      <div class="game-card win">
+        <div>
+          <div class="game-date">31 Mar</div>
+          <div class="game-date-sub">2026</div>
+          <div class="game-number">#1</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Croácia <img src="https://flagcdn.com/w40/hr.png" alt="Croácia"></div>
+          <div class="game-competition">Amistoso Internacional · Orlando, EUA</div>
+        </div>
+        <div class="game-score">3 – 1</div>
+        <div class="result-badge win">Vitória</div>
+      </div>
+
+      <div class="game-card loss">
+        <div>
+          <div class="game-date">26 Mar</div>
+          <div class="game-date-sub">2026</div>
+          <div class="game-number">#2</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> França <img src="https://flagcdn.com/w40/fr.png" alt="França"></div>
+          <div class="game-competition">Amistoso Internacional · Foxborough, EUA</div>
+        </div>
+        <div class="game-score">1 – 2</div>
+        <div class="result-badge loss">Derrota</div>
+      </div>
+
+      <div class="game-card draw">
+        <div>
+          <div class="game-date">18 Nov</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#3</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Tunísia <img src="https://flagcdn.com/w40/tn.png" alt="Tunísia"></div>
+          <div class="game-competition">Amistoso Internacional</div>
+        </div>
+        <div class="game-score">1 – 1</div>
+        <div class="result-badge draw">Empate</div>
+      </div>
+
+      <div class="game-card win">
+        <div>
+          <div class="game-date">15 Nov</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#4</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Senegal <img src="https://flagcdn.com/w40/sn.png" alt="Senegal"></div>
+          <div class="game-competition">Amistoso Internacional</div>
+        </div>
+        <div class="game-score">2 – 0</div>
+        <div class="result-badge win">Vitória</div>
+      </div>
+
+      <div class="game-card loss">
+        <div>
+          <div class="game-date">14 Out</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#5</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Japão <img src="https://flagcdn.com/w40/jp.png" alt="Japão"></div>
+          <div class="game-competition">Amistoso Internacional</div>
+        </div>
+        <div class="game-score">2 – 3</div>
+        <div class="result-badge loss">Derrota</div>
+      </div>
+
+      <div class="game-card win">
+        <div>
+          <div class="game-date">10 Out</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#6</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Coreia do Sul <img src="https://flagcdn.com/w40/kr.png" alt="Coreia do Sul"></div>
+          <div class="game-competition">Amistoso Internacional</div>
+        </div>
+        <div class="game-score">5 – 0</div>
+        <div class="result-badge win">Vitória</div>
+      </div>
+
+      <div class="game-card loss">
+        <div>
+          <div class="game-date">09 Set</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#7</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Bolívia <img src="https://flagcdn.com/w40/bo.png" alt="Bolívia"></div>
+          <div class="game-competition">Eliminatórias Copa do Mundo 2026 · CONMEBOL</div>
+        </div>
+        <div class="game-score">0 – 1</div>
+        <div class="result-badge loss">Derrota</div>
+      </div>
+
+      <div class="game-card win">
+        <div>
+          <div class="game-date">04 Set</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#8</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Chile <img src="https://flagcdn.com/w40/cl.png" alt="Chile"></div>
+          <div class="game-competition">Eliminatórias Copa do Mundo 2026 · CONMEBOL</div>
+        </div>
+        <div class="game-score">3 – 0</div>
+        <div class="result-badge win">Vitória</div>
+      </div>
+
+      <div class="game-card win">
+        <div>
+          <div class="game-date">10 Jun</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#9</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Paraguai <img src="https://flagcdn.com/w40/py.png" alt="Paraguai"></div>
+          <div class="game-competition">Eliminatórias Copa do Mundo 2026 · CONMEBOL</div>
+        </div>
+        <div class="game-score">1 – 0</div>
+        <div class="result-badge win">Vitória</div>
+      </div>
+
+      <div class="game-card draw">
+        <div>
+          <div class="game-date">05 Jun</div>
+          <div class="game-date-sub">2025</div>
+          <div class="game-number">#10</div>
+        </div>
+        <div class="game-info">
+          <div class="game-matchup"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"> Brasil <span class="vs-text">vs</span> Equador <img src="https://flagcdn.com/w40/ec.png" alt="Equador"></div>
+          <div class="game-competition">Eliminatórias Copa do Mundo 2026 · CONMEBOL</div>
+        </div>
+        <div class="game-score">0 – 0</div>
+        <div class="result-badge draw">Empate</div>
+      </div>
+
+    </div>
+
+    <div class="coach-section">
+      <div class="coach-icon">🧑‍💼</div>
+      <div class="coach-info">
+        <h3>Carlo Ancelotti — Técnico da Seleção</h3>
+        <p>Assumiu o comando em maio de 2025. O Brasil já está classificado para a Copa do Mundo FIFA 2026 (EUA, Canadá e México).</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Dados atualizados em 01 de abril de 2026 · Seleção Brasileira de Futebol
+  </footer>
+
+</body>
+</html>
