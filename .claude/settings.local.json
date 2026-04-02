@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:bolavip.com)",
+      "WebFetch(domain:www.fotmob.com)",
+      "WebSearch",
+      "Bash(start:*)",
+      "Bash(gh auth:*)",
+      "Bash(git --version)"
+    ]
+  }
+}
